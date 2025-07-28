@@ -23,7 +23,11 @@ import {
   CreditCard,
   Shield,
   MapPin,
-  Utensils
+  Utensils,
+  Heart,
+  Award,
+  Sparkles,
+  X
 } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
@@ -41,66 +45,67 @@ const serviceTypes = [
   {
     id: "intimate",
     name: "Experiencia Íntima",
-    description: "Perfecto para parejas o grupos pequeños",
-    icon: "❤️",
+    description: "Perfecto para parejas o grupos pequeños que buscan una experiencia romántica y personalizada",
+    icon: <Heart className="h-8 w-8" />,
+    emoji: "💕",
     recommended: [2, 4],
-    features: ["Menú degustación", "Servicio personalizado", "Ambientación romántica"]
+    gradient: "from-rose-500 to-pink-600",
+    features: ["Menú degustación personalizado", "Servicio exclusivo", "Ambientación romántica", "Maridaje premium"]
   },
   {
     id: "family",
     name: "Celebración Familiar",
-    description: "Ideal para reuniones familiares especiales",
-    icon: "👨‍👩‍👧‍👦",
+    description: "Ideal para reuniones familiares especiales y momentos que perduran en el tiempo",
+    icon: <Users className="h-8 w-8" />,
+    emoji: "👨‍👩‍👧‍👦",
     recommended: [6, 12],
-    features: ["Menú familiar compartido", "Opciones para niños", "Servicio completo"]
+    gradient: "from-emerald-500 to-teal-600",
+    features: ["Menú familiar compartido", "Opciones para todas las edades", "Servicio completo", "Fotografía incluida"]
   },
   {
     id: "corporate",
     name: "Evento Corporativo",
-    description: "Experiencia profesional para empresas",
-    icon: "🏢",
+    description: "Experiencia profesional de alto nivel para impresionar a clientes y colaboradores",
+    icon: <Award className="h-8 w-8" />,
+    emoji: "🏢",
     recommended: [8, 15],
-    features: ["Menú ejecutivo", "Presentación elegante", "Servicio discreto"]
+    gradient: "from-violet-500 to-purple-600",
+    features: ["Menú ejecutivo gourmet", "Presentación impecable", "Servicio discreto", "Coordinación profesional"]
   },
   {
     id: "celebration",
     name: "Ocasión Especial",
-    description: "Para cumpleaños, aniversarios y celebraciones",
-    icon: "🎉",
+    description: "Para cumpleaños, aniversarios y celebraciones que merecen ser inolvidables",
+    icon: <Sparkles className="h-8 w-8" />,
+    emoji: "🎉",
     recommended: [4, 10],
-    features: ["Decoración temática", "Pastel incluido", "Fotografía del evento"]
+    gradient: "from-amber-500 to-orange-600",
+    features: ["Decoración temática", "Pastel artesanal", "Fotografía del evento", "Sorpresas especiales"]
   }
 ]
 
 const timeSlots = [
-  { value: "12:00", label: "12:00 PM - Almuerzo" },
-  { value: "13:30", label: "1:30 PM - Almuerzo tardío" },
-  { value: "18:00", label: "6:00 PM - Cena temprana" },
-  { value: "19:30", label: "7:30 PM - Cena" },
-  { value: "21:00", label: "9:00 PM - Cena tardía" }
+  { value: "12:00", label: "12:00 PM", description: "Almuerzo elegante" },
+  { value: "13:30", label: "1:30 PM", description: "Almuerzo tardío" },
+  { value: "18:00", label: "6:00 PM", description: "Cena temprana" },
+  { value: "19:30", label: "7:30 PM", description: "Cena clásica" },
+  { value: "21:00", label: "9:00 PM", description: "Cena tardía" }
 ]
 
 export default function EnhancedBookingModal({ isOpen, onClose }: BookingModalProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [date, setDate] = useState<Date>()
   const [formData, setFormData] = useState({
-    // Step 1: Service Selection
     serviceType: "",
     guests: MIN_GUESTS,
-    
-    // Step 2: Date & Time
     selectedDate: null as Date | null,
     selectedTime: "",
-    
-    // Step 3: Personal Details
     name: "",
     email: "",
     phone: "",
     address: "",
     specialRequests: "",
     dietaryRestrictions: "",
-    
-    // Step 4: Payment
     cardNumber: "",
     expiryDate: "",
     cvv: "",
@@ -112,10 +117,10 @@ export default function EnhancedBookingModal({ isOpen, onClose }: BookingModalPr
   const remaining = totalPrice - deposit
 
   const steps = [
-    { number: 1, title: "Servicio", description: "Tipo y huéspedes" },
-    { number: 2, title: "Fecha", description: "Cuándo y hora" },
-    { number: 3, title: "Detalles", description: "Información personal" },
-    { number: 4, title: "Pago", description: "Confirmar reserva" }
+    { number: 1, title: "Experiencia", description: "Tipo de servicio", icon: ChefHat },
+    { number: 2, title: "Fecha & Hora", description: "Cuándo celebrar", icon: CalendarIcon },
+    { number: 3, title: "Detalles", description: "Información personal", icon: Users },
+    { number: 4, title: "Confirmación", description: "Pago seguro", icon: CreditCard }
   ]
 
   const handleInputChange = (field: string, value: any) => {
@@ -163,139 +168,207 @@ export default function EnhancedBookingModal({ isOpen, onClose }: BookingModalPr
   }
 
   const renderStepIndicator = () => (
-    <div className="flex justify-center mb-4 sm:mb-8">
-      <div className="flex items-center space-x-2 sm:space-x-4 overflow-x-auto">
-        {steps.map((step, index) => (
-          <React.Fragment key={step.number}>
-            <div className="flex flex-col items-center min-w-0">
-              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold
-                ${currentStep >= step.number 
-                  ? 'bg-amber-600 text-white' 
-                  : 'bg-gray-200 text-gray-500'}`}>
-                {currentStep > step.number ? <Check className="h-3 w-3 sm:h-5 sm:w-5" /> : step.number}
+    <div className="relative mb-8">
+      <div className="flex justify-center">
+        <div className="flex items-center space-x-4 overflow-x-auto pb-4">
+          {steps.map((step, index) => (
+            <React.Fragment key={step.number}>
+              <div className="flex flex-col items-center min-w-0 group">
+                <div className={`relative w-14 h-14 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                  currentStep >= step.number 
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg scale-110' 
+                    : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'
+                }`}>
+                  {currentStep > step.number ? (
+                    <Check className="h-6 w-6" />
+                  ) : (
+                    <step.icon className="h-6 w-6" />
+                  )}
+                  {currentStep === step.number && (
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 animate-pulse opacity-50"></div>
+                  )}
+                </div>
+                <div className="text-center mt-3">
+                  <div className={`text-sm font-semibold ${
+                    currentStep >= step.number ? 'text-gray-900' : 'text-gray-500'
+                  }`}>
+                    {step.title}
+                  </div>
+                  <div className="text-xs text-gray-400 hidden sm:block">{step.description}</div>
+                </div>
               </div>
-              <div className="text-center mt-1 sm:mt-2">
-                <div className="text-xs font-medium text-gray-900">{step.title}</div>
-                <div className="text-xs text-gray-500 hidden sm:block">{step.description}</div>
-              </div>
-            </div>
-            {index < steps.length - 1 && (
-              <div className={`w-8 sm:w-16 h-0.5 ${currentStep > step.number ? 'bg-amber-600' : 'bg-gray-200'}`} />
-            )}
-          </React.Fragment>
-        ))}
+              {index < steps.length - 1 && (
+                <div className={`w-16 h-0.5 mt-7 transition-all duration-300 ${
+                  currentStep > step.number 
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-600' 
+                    : 'bg-gray-200'
+                }`} />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </div>
   )
 
   const renderStep1 = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="text-center">
-        <h3 className="text-2xl font-serif text-gray-900 mb-2">Selecciona tu Experiencia</h3>
-        <p className="text-gray-600">Elige el tipo de servicio que mejor se adapte a tu ocasión</p>
+        <div className="inline-flex items-center bg-amber-100 rounded-full px-6 py-2 mb-6">
+          <Sparkles className="h-4 w-4 mr-2 text-amber-600" />
+          <span className="text-amber-800 text-sm font-medium">Paso 1 de 4</span>
+        </div>
+        <h3 className="text-3xl font-bold text-gray-900 mb-3">Selecciona tu Experiencia</h3>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Cada experiencia está cuidadosamente diseñada para crear momentos inolvidables
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {serviceTypes.map((service) => (
           <Card 
             key={service.id}
-            className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
+            className={`relative cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 overflow-hidden group ${
               formData.serviceType === service.id 
-                ? 'ring-2 ring-amber-600 border-amber-600' 
-                : 'border-gray-200'
+                ? 'ring-2 ring-amber-400 shadow-2xl scale-105' 
+                : 'hover:shadow-xl'
             }`}
             onClick={() => handleInputChange("serviceType", service.id)}
           >
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="text-2xl">{service.icon}</div>
-                {formData.serviceType === service.id && (
-                  <Check className="h-5 w-5 text-amber-600" />
-                )}
+            <div className={`h-2 bg-gradient-to-r ${service.gradient}`}></div>
+            
+            <CardHeader className="pb-4 relative">
+              {formData.serviceType === service.id && (
+                <div className="absolute top-4 right-4">
+                  <div className="bg-green-500 rounded-full p-1">
+                    <Check className="h-4 w-4 text-white" />
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-center justify-between mb-4">
+                <div className={`p-3 rounded-xl bg-gradient-to-r ${service.gradient} text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  {service.icon}
+                </div>
+                <div className="text-3xl">{service.emoji}</div>
               </div>
-              <CardTitle className="text-lg">{service.name}</CardTitle>
-              <CardDescription>{service.description}</CardDescription>
+              
+              <CardTitle className="text-xl font-bold text-gray-900 mb-2">{service.name}</CardTitle>
+              <CardDescription className="text-gray-600 leading-relaxed">
+                {service.description}
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="text-sm text-gray-600">
+
+            <CardContent className="space-y-4">
+              <div className="bg-gray-50 rounded-lg p-3">
+                <div className="flex items-center text-sm text-gray-600 mb-2">
+                  <Users className="h-4 w-4 mr-2 text-amber-600" />
                   Recomendado: {service.recommended[0]}-{service.recommended[1]} personas
                 </div>
-                <div className="flex flex-wrap gap-1">
-                  {service.features.map((feature, idx) => (
-                    <Badge key={idx} variant="secondary" className="text-xs">
-                      {feature}
-                    </Badge>
-                  ))}
-                </div>
+              </div>
+              
+              <div className="space-y-2">
+                {service.features.map((feature, idx) => (
+                  <div key={idx} className="flex items-center text-sm text-gray-700">
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mr-3 flex-shrink-0"></div>
+                    {feature}
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-6">
-        <h4 className="font-semibold text-gray-900 mb-4 flex items-center">
-          <Users className="h-5 w-5 mr-2 text-amber-600" />
-          Número de Huéspedes
-        </h4>
-        <div className="flex items-center justify-center space-x-6">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleGuestChange(false)}
-            disabled={formData.guests <= MIN_GUESTS}
-            className="w-10 h-10 rounded-full p-0"
-          >
-            -
-          </Button>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-gray-900">{formData.guests}</div>
-            <div className="text-sm text-gray-500">personas</div>
+      <Card className="bg-gradient-to-br from-gray-50 to-white border-0 shadow-xl">
+        <CardContent className="p-8">
+          <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+            <Users className="h-6 w-6 mr-3 text-amber-600" />
+            Número de Huéspedes
+          </h4>
+          
+          <div className="flex items-center justify-center space-x-8">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => handleGuestChange(false)}
+              disabled={formData.guests <= MIN_GUESTS}
+              className="w-12 h-12 rounded-full p-0 border-2 border-amber-200 hover:border-amber-400 hover:bg-amber-50 disabled:opacity-50"
+            >
+              -
+            </Button>
+            
+            <div className="text-center">
+              <div className="text-5xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                {formData.guests}
+              </div>
+              <div className="text-gray-500 font-medium">personas</div>
+            </div>
+            
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => handleGuestChange(true)}
+              disabled={formData.guests >= MAX_GUESTS}
+              className="w-12 h-12 rounded-full p-0 border-2 border-amber-200 hover:border-amber-400 hover:bg-amber-50 disabled:opacity-50"
+            >
+              +
+            </Button>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleGuestChange(true)}
-            disabled={formData.guests >= MAX_GUESTS}
-            className="w-10 h-10 rounded-full p-0"
-          >
-            +
-          </Button>
-        </div>
-        <div className="mt-4 text-center">
-          <div className="text-lg font-semibold text-gray-900">
-            ${totalPrice.toLocaleString()} MXN total
+          
+          <div className="mt-8 text-center">
+            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+              <div className="text-3xl font-bold text-gray-900 mb-2">
+                ${totalPrice.toLocaleString()} MXN
+              </div>
+              <div className="text-gray-600">
+                ${PRICE_PER_PERSON.toLocaleString()} MXN por persona
+              </div>
+              <div className="flex items-center justify-center mt-3">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-4 w-4 text-amber-500 fill-current" />
+                ))}
+                <span className="text-sm text-gray-600 ml-2">Experiencia Premium</span>
+              </div>
+            </div>
           </div>
-          <div className="text-sm text-gray-600">
-            ${PRICE_PER_PERSON.toLocaleString()} MXN por persona
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   )
 
   const renderStep2 = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="text-center">
-        <h3 className="text-2xl font-serif text-gray-900 mb-2">Fecha y Hora</h3>
-        <p className="text-gray-600">¿Cuándo te gustaría tener tu experiencia culinaria?</p>
+        <div className="inline-flex items-center bg-amber-100 rounded-full px-6 py-2 mb-6">
+          <CalendarIcon className="h-4 w-4 mr-2 text-amber-600" />
+          <span className="text-amber-800 text-sm font-medium">Paso 2 de 4</span>
+        </div>
+        <h3 className="text-3xl font-bold text-gray-900 mb-3">Fecha y Hora Perfecta</h3>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Elige el momento ideal para tu experiencia culinaria excepcional
+        </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <div>
-          <Label className="text-base font-medium">Selecciona la Fecha</Label>
-          <div className="mt-2">
+      <div className="grid lg:grid-cols-2 gap-8">
+        <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-gray-50">
+          <CardHeader>
+            <CardTitle className="flex items-center text-xl">
+              <CalendarIcon className="mr-3 h-6 w-6 text-amber-600" />
+              Selecciona la Fecha
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
             <Popover>
               <PopoverTrigger asChild>
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start text-left font-normal h-12"
+                  className="w-full justify-start text-left font-normal h-14 text-lg border-2 border-gray-200 hover:border-amber-400 hover:bg-amber-50"
                 >
-                  <CalendarIcon className="mr-3 h-5 w-5 text-amber-600" />
+                  <CalendarIcon className="mr-3 h-6 w-6 text-amber-600" />
                   {formData.selectedDate 
                     ? format(formData.selectedDate, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: es })
-                    : "Elegir fecha"
+                    : "Elegir fecha especial"
                   }
                 </Button>
               </PopoverTrigger>
@@ -309,263 +382,365 @@ export default function EnhancedBookingModal({ isOpen, onClose }: BookingModalPr
                 />
               </PopoverContent>
             </Popover>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div>
-          <Label className="text-base font-medium">Hora del Servicio</Label>
-          <div className="mt-2 space-y-2">
+        <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-gray-50">
+          <CardHeader>
+            <CardTitle className="flex items-center text-xl">
+              <Clock className="mr-3 h-6 w-6 text-amber-600" />
+              Hora del Servicio
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
             {timeSlots.map((slot) => (
               <Button
                 key={slot.value}
                 variant={formData.selectedTime === slot.value ? "default" : "outline"}
-                className={`w-full justify-start h-12 ${
+                className={`w-full justify-between h-14 text-left transition-all duration-300 ${
                   formData.selectedTime === slot.value 
-                    ? 'bg-amber-600 hover:bg-amber-700' 
-                    : ''
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-lg' 
+                    : 'border-2 border-gray-200 hover:border-amber-400 hover:bg-amber-50'
                 }`}
                 onClick={() => handleInputChange("selectedTime", slot.value)}
               >
-                <Clock className="mr-3 h-4 w-4" />
-                {slot.label}
+                <div className="flex items-center">
+                  <Clock className="mr-3 h-5 w-5" />
+                  <div>
+                    <div className="font-semibold">{slot.label}</div>
+                    <div className={`text-sm ${
+                      formData.selectedTime === slot.value ? 'text-amber-100' : 'text-gray-500'
+                    }`}>
+                      {slot.description}
+                    </div>
+                  </div>
+                </div>
               </Button>
             ))}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {formData.selectedDate && formData.selectedTime && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <Check className="h-5 w-5 text-amber-600 mr-2" />
-            <span className="font-medium text-amber-800">
-              Fecha seleccionada: {format(formData.selectedDate, "EEEE, dd 'de' MMMM", { locale: es })} 
-              a las {timeSlots.find(s => s.value === formData.selectedTime)?.label}
-            </span>
-          </div>
-        </div>
+        <Card className="border-0 bg-gradient-to-r from-green-50 to-emerald-50 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <div className="bg-green-500 rounded-full p-2 mr-4">
+                <Check className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <div className="font-bold text-green-800 text-lg">¡Fecha Confirmada!</div>
+                <div className="text-green-700">
+                  {format(formData.selectedDate, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: es })} 
+                  {" a las "} 
+                  {timeSlots.find(s => s.value === formData.selectedTime)?.label}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   )
 
   const renderStep3 = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="text-center">
-        <h3 className="text-2xl font-serif text-gray-900 mb-2">Información Personal</h3>
-        <p className="text-gray-600">Necesitamos algunos detalles para personalizar tu experiencia</p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="name">Nombre Completo *</Label>
-          <Input
-            id="name"
-            value={formData.name}
-            onChange={(e) => handleInputChange("name", e.target.value)}
-            className="mt-1"
-            placeholder="Tu nombre completo"
-          />
+        <div className="inline-flex items-center bg-amber-100 rounded-full px-6 py-2 mb-6">
+          <Users className="h-4 w-4 mr-2 text-amber-600" />
+          <span className="text-amber-800 text-sm font-medium">Paso 3 de 4</span>
         </div>
-        <div>
-          <Label htmlFor="email">Correo Electrónico *</Label>
-          <Input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => handleInputChange("email", e.target.value)}
-            className="mt-1"
-            placeholder="tu@email.com"
-          />
-        </div>
+        <h3 className="text-3xl font-bold text-gray-900 mb-3">Información Personal</h3>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Necesitamos algunos detalles para personalizar tu experiencia única
+        </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="phone">Teléfono *</Label>
-          <Input
-            id="phone"
-            value={formData.phone}
-            onChange={(e) => handleInputChange("phone", e.target.value)}
-            className="mt-1"
-            placeholder="+52 55 1234 5678"
-          />
-        </div>
-        <div>
-          <Label htmlFor="address">Dirección del Evento *</Label>
-          <Input
-            id="address"
-            value={formData.address}
-            onChange={(e) => handleInputChange("address", e.target.value)}
-            className="mt-1"
-            placeholder="Dirección completa donde será el servicio"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="dietary">Restricciones Dietéticas</Label>
-        <Textarea
-          id="dietary"
-          value={formData.dietaryRestrictions}
-          onChange={(e) => handleInputChange("dietaryRestrictions", e.target.value)}
-          className="mt-1"
-          placeholder="Alergias, intolerancias, preferencias vegetarianas/veganas, etc."
-          rows={3}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="special">Solicitudes Especiales</Label>
-        <Textarea
-          id="special"
-          value={formData.specialRequests}
-          onChange={(e) => handleInputChange("specialRequests", e.target.value)}
-          className="mt-1"
-          placeholder="Ocasión especial, preferencias de menú, decoración, etc."
-          rows={3}
-        />
-      </div>
-    </div>
-  )
-
-  const renderStep4 = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h3 className="text-2xl font-serif text-gray-900 mb-2">Confirmar Reserva</h3>
-        <p className="text-gray-600">Revisar detalles y proceder con el pago del depósito</p>
-      </div>
-
-      {/* Order Summary */}
-      <Card className="border-gray-200">
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-gray-50">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <ChefHat className="mr-2 h-5 w-5 text-amber-600" />
-            Resumen de tu Reserva
+          <CardTitle className="flex items-center text-xl">
+            <Users className="mr-3 h-6 w-6 text-amber-600" />
+            Datos de Contacto
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span>Servicio:</span>
-            <span className="font-medium">
-              {serviceTypes.find(s => s.id === formData.serviceType)?.name}
-            </span>
+        <CardContent className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="name" className="text-base font-medium text-gray-700">Nombre Completo *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => handleInputChange("name", e.target.value)}
+                className="mt-2 h-12 border-2 border-gray-200 focus:border-amber-400 focus:ring-amber-200"
+                placeholder="Tu nombre completo"
+              />
+            </div>
+            <div>
+              <Label htmlFor="email" className="text-base font-medium text-gray-700">Correo Electrónico *</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                className="mt-2 h-12 border-2 border-gray-200 focus:border-amber-400 focus:ring-amber-200"
+                placeholder="tu@email.com"
+              />
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <span>Huéspedes:</span>
-            <span className="font-medium">{formData.guests} personas</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span>Fecha:</span>
-            <span className="font-medium">
-              {formData.selectedDate && format(formData.selectedDate, "dd/MM/yyyy", { locale: es })}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span>Hora:</span>
-            <span className="font-medium">
-              {timeSlots.find(s => s.value === formData.selectedTime)?.label}
-            </span>
-          </div>
-          <hr className="my-4" />
-          <div className="flex justify-between items-center text-lg">
-            <span>Total:</span>
-            <span className="font-bold">${totalPrice.toLocaleString()} MXN</span>
-          </div>
-          <div className="flex justify-between items-center text-amber-600">
-            <span>Depósito (50%):</span>
-            <span className="font-semibold">${deposit.toLocaleString()} MXN</span>
-          </div>
-          <div className="flex justify-between items-center text-gray-600">
-            <span>Restante:</span>
-            <span>${remaining.toLocaleString()} MXN (se paga el día del evento)</span>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="phone" className="text-base font-medium text-gray-700">Teléfono *</Label>
+              <Input
+                id="phone"
+                value={formData.phone}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                className="mt-2 h-12 border-2 border-gray-200 focus:border-amber-400 focus:ring-amber-200"
+                placeholder="+52 55 1234 5678"
+              />
+            </div>
+            <div>
+              <Label htmlFor="address" className="text-base font-medium text-gray-700">Dirección del Evento *</Label>
+              <Input
+                id="address"
+                value={formData.address}
+                onChange={(e) => handleInputChange("address", e.target.value)}
+                className="mt-2 h-12 border-2 border-gray-200 focus:border-amber-400 focus:ring-amber-200"
+                placeholder="Dirección completa donde será el servicio"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Payment Form */}
-      <Card className="border-gray-200">
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-gray-50">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <CreditCard className="mr-2 h-5 w-5 text-amber-600" />
+          <CardTitle className="flex items-center text-xl">
+            <Utensils className="mr-3 h-6 w-6 text-amber-600" />
+            Preferencias Culinarias
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <Label htmlFor="dietary" className="text-base font-medium text-gray-700">Restricciones Dietéticas</Label>
+            <Textarea
+              id="dietary"
+              value={formData.dietaryRestrictions}
+              onChange={(e) => handleInputChange("dietaryRestrictions", e.target.value)}
+              className="mt-2 border-2 border-gray-200 focus:border-amber-400 focus:ring-amber-200"
+              placeholder="Alergias, intolerancias, preferencias vegetarianas/veganas, etc."
+              rows={4}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="special" className="text-base font-medium text-gray-700">Solicitudes Especiales</Label>
+            <Textarea
+              id="special"
+              value={formData.specialRequests}
+              onChange={(e) => handleInputChange("specialRequests", e.target.value)}
+              className="mt-2 border-2 border-gray-200 focus:border-amber-400 focus:ring-amber-200"
+              placeholder="Ocasión especial, preferencias de menú, decoración, música, etc."
+              rows={4}
+            />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+
+  const renderStep4 = () => (
+    <div className="space-y-8">
+      <div className="text-center">
+        <div className="inline-flex items-center bg-amber-100 rounded-full px-6 py-2 mb-6">
+          <CreditCard className="h-4 w-4 mr-2 text-amber-600" />
+          <span className="text-amber-800 text-sm font-medium">Paso 4 de 4</span>
+        </div>
+        <h3 className="text-3xl font-bold text-gray-900 mb-3">Confirmar Reserva</h3>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Último paso para asegurar tu experiencia culinaria excepcional
+        </p>
+      </div>
+
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-gray-50">
+        <CardHeader>
+          <CardTitle className="flex items-center text-xl">
+            <ChefHat className="mr-3 h-6 w-6 text-amber-600" />
+            Resumen de tu Reserva
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-600">Servicio:</span>
+                <span className="font-semibold text-gray-900">
+                  {serviceTypes.find(s => s.id === formData.serviceType)?.name}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-600">Huéspedes:</span>
+                <span className="font-semibold text-gray-900">{formData.guests} personas</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-600">Fecha:</span>
+                <span className="font-semibold text-gray-900">
+                  {formData.selectedDate && format(formData.selectedDate, "dd/MM/yyyy", { locale: es })}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="text-gray-600">Hora:</span>
+                <span className="font-semibold text-gray-900">
+                  {timeSlots.find(s => s.value === formData.selectedTime)?.label}
+                </span>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-200">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900 mb-2">
+                  ${totalPrice.toLocaleString()}
+                </div>
+                <div className="text-gray-600 mb-4">MXN Total</div>
+                
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-amber-700 font-medium">Depósito (50%):</span>
+                    <span className="font-bold text-amber-700">${deposit.toLocaleString()} MXN</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Restante:</span>
+                    <span className="text-gray-900">${remaining.toLocaleString()} MXN</span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-2">
+                    *El resto se paga el día del evento
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-gray-50">
+        <CardHeader>
+          <CardTitle className="flex items-center text-xl">
+            <CreditCard className="mr-3 h-6 w-6 text-amber-600" />
             Información de Pago
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-lg text-gray-600">
             Pago seguro del depósito de ${deposit.toLocaleString()} MXN
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div>
-            <Label htmlFor="cardNumber">Número de Tarjeta</Label>
+            <Label htmlFor="cardNumber" className="text-base font-medium text-gray-700">Número de Tarjeta</Label>
             <Input
               id="cardNumber"
               value={formData.cardNumber}
               onChange={(e) => handleInputChange("cardNumber", e.target.value)}
               placeholder="1234 5678 9012 3456"
-              className="mt-1"
+              className="mt-2 h-12 border-2 border-gray-200 focus:border-amber-400 focus:ring-amber-200"
             />
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2">
-              <Label htmlFor="expiryDate">Fecha de Vencimiento</Label>
+          
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="expiryDate" className="text-base font-medium text-gray-700">Fecha de Vencimiento</Label>
               <Input
                 id="expiryDate"
                 value={formData.expiryDate}
                 onChange={(e) => handleInputChange("expiryDate", e.target.value)}
                 placeholder="MM/AA"
-                className="mt-1"
+                className="mt-2 h-12 border-2 border-gray-200 focus:border-amber-400 focus:ring-amber-200"
               />
             </div>
             <div>
-              <Label htmlFor="cvv">CVV</Label>
+              <Label htmlFor="cvv" className="text-base font-medium text-gray-700">CVV</Label>
               <Input
                 id="cvv"
                 value={formData.cvv}
                 onChange={(e) => handleInputChange("cvv", e.target.value)}
                 placeholder="123"
-                className="mt-1"
+                className="mt-2 h-12 border-2 border-gray-200 focus:border-amber-400 focus:ring-amber-200"
               />
             </div>
           </div>
+          
           <div>
-            <Label htmlFor="cardholderName">Nombre del Titular</Label>
+            <Label htmlFor="cardholderName" className="text-base font-medium text-gray-700">Nombre del Titular</Label>
             <Input
               id="cardholderName"
               value={formData.cardholderName}
               onChange={(e) => handleInputChange("cardholderName", e.target.value)}
               placeholder="Nombre como aparece en la tarjeta"
-              className="mt-1"
+              className="mt-2 h-12 border-2 border-gray-200 focus:border-amber-400 focus:ring-amber-200"
             />
           </div>
         </CardContent>
       </Card>
 
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-        <div className="flex items-start">
-          <Shield className="h-5 w-5 text-green-600 mr-2 mt-0.5" />
-          <div className="text-sm text-green-800">
-            <div className="font-medium mb-1">Pago 100% Seguro</div>
-            <div>Tu información está protegida con encriptación SSL. El resto del pago se realiza directamente con el chef el día del evento.</div>
+      <Card className="border-0 bg-gradient-to-r from-green-50 to-emerald-50 shadow-lg">
+        <CardContent className="p-6">
+          <div className="flex items-start">
+            <div className="bg-green-500 rounded-full p-2 mr-4 flex-shrink-0">
+              <Shield className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <div className="font-bold text-green-800 text-lg mb-2">Pago 100% Seguro</div>
+              <div className="text-green-700 leading-relaxed">
+                Tu información está protegida con encriptación SSL de nivel bancario. 
+                El resto del pago se realiza directamente con el chef el día del evento. 
+                <strong> Garantía de satisfacción del 100%.</strong>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   )
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-4xl h-[90vh] p-0 flex flex-col">
+      <DialogContent className="w-[95vw] max-w-6xl h-[90vh] p-0 flex flex-col bg-white">
         <DialogHeader className="sr-only">
           <DialogTitle>Reservar Experiencia Culinaria - Paso {currentStep} de 4</DialogTitle>
         </DialogHeader>
         
-        {/* Header fijo */}
-        <div className="p-4 sm:p-6 pb-4 border-b border-gray-100 flex-shrink-0">
-          {renderStepIndicator()}
+        {/* Header con gradiente */}
+        <div className="relative p-6 pb-8 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex-shrink-0">
+          {/* Elementos decorativos de fondo */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-4 right-4 w-20 h-20 bg-amber-500 rounded-full blur-xl"></div>
+            <div className="absolute bottom-4 left-4 w-16 h-16 bg-orange-500 rounded-full blur-xl"></div>
+          </div>
+          
+          {/* Botón cerrar */}
+          <button 
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 text-gray-400 hover:text-white transition-colors duration-200"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          
+          {/* Contenido del header */}
+          <div className="relative z-10">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg mr-4">
+                <ChefHat className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold">EM Cuisine</h2>
+                <p className="text-amber-300 text-sm">Experiencia Culinaria Premium</p>
+              </div>
+            </div>
+            {renderStepIndicator()}
+          </div>
         </div>
         
         {/* Contenido con scroll */}
         <div className="flex-1 overflow-y-auto">
-          <div className="p-4 sm:p-6 pt-4">
+          <div className="p-8">
             {currentStep === 1 && renderStep1()}
             {currentStep === 2 && renderStep2()}
             {currentStep === 3 && renderStep3()}
@@ -573,39 +748,109 @@ export default function EnhancedBookingModal({ isOpen, onClose }: BookingModalPr
           </div>
         </div>
 
-        {/* Footer fijo */}
-        <div className="p-4 sm:p-6 pt-4 border-t border-gray-200 flex-shrink-0">
-          <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
+        {/* Footer fijo con gradiente sutil */}
+        <div className="p-6 bg-gradient-to-r from-gray-50 to-white border-t border-gray-200 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row gap-4 sm:justify-between items-center">
             <Button
               variant="outline"
+              size="lg"
               onClick={() => currentStep > 1 ? setCurrentStep(currentStep - 1) : onClose()}
-              className="flex items-center justify-center w-full sm:w-auto"
+              className="flex items-center justify-center w-full sm:w-auto border-2 border-gray-300 hover:border-gray-400 h-12"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {currentStep > 1 ? "Anterior" : "Cancelar"}
+              <ArrowLeft className="mr-2 h-5 w-5" />
+              {currentStep > 1 ? "Paso Anterior" : "Cancelar"}
             </Button>
 
             {currentStep < 4 ? (
               <Button
+                size="lg"
                 onClick={() => setCurrentStep(currentStep + 1)}
                 disabled={!canProceedToNextStep()}
-                className="bg-amber-600 hover:bg-amber-700 flex items-center justify-center w-full sm:w-auto"
+                className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center w-full sm:w-auto h-12 px-8"
               >
                 Continuar
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             ) : (
               <Button
+                size="lg"
                 onClick={handleSubmit}
                 disabled={!canProceedToNextStep()}
-                className="bg-green-600 hover:bg-green-700 flex items-center justify-center w-full sm:w-auto"
+                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center w-full sm:w-auto h-12 px-8"
               >
-                <Check className="mr-2 h-4 w-4" />
+                <Check className="mr-2 h-5 w-5" />
                 Confirmar Reserva
               </Button>
             )}
           </div>
+          
+          {/* Indicador de progreso */}
+          <div className="mt-4">
+            <div className="bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-amber-500 to-orange-600 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${(currentStep / 4) * 100}%` }}
+              ></div>
+            </div>
+            <div className="flex justify-between text-xs text-gray-500 mt-2">
+              <span>Inicio</span>
+              <span>{currentStep} de 4</span>
+              <span>Confirmación</span>
+            </div>
+          </div>
         </div>
+
+        {/* Estilos adicionales */}
+        <style jsx global>{`
+          /* Animaciones personalizadas para el modal */
+          @keyframes fadeInScale {
+            from {
+              opacity: 0;
+              transform: scale(0.95);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+          
+          @keyframes slideInFromRight {
+            from {
+              opacity: 0;
+              transform: translateX(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+          
+          .animate-fade-in-scale {
+            animation: fadeInScale 0.3s ease-out forwards;
+          }
+          
+          .animate-slide-in-right {
+            animation: slideInFromRight 0.4s ease-out forwards;
+          }
+          
+          /* Scrollbar personalizada para el modal */
+          .modal-content::-webkit-scrollbar {
+            width: 6px;
+          }
+          
+          .modal-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+          }
+          
+          .modal-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #f59e0b, #ea580c);
+            border-radius: 3px;
+          }
+          
+          .modal-content::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #d97706, #dc2626);
+          }
+        `}</style>
       </DialogContent>
     </Dialog>
   )

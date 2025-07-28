@@ -305,7 +305,7 @@ export default function HomePage() {
               size="lg"
               variant="outline"
               onClick={() => setIsChatOpen(true)}
-              className="border-2 border-white/30 text-white hover:bg-white hover:text-gray-900 text-lg px-8 py-4 rounded-full backdrop-blur-sm transform hover:scale-105 transition-all duration-300 flex items-center"
+              className="border-2 border-white/30 text-black hover:bg-white hover:text-gray-900 text-lg px-8 py-4 rounded-full backdrop-blur-sm transform hover:scale-105 transition-all duration-300 flex items-center"
             >
               <MessageCircle className="mr-3 h-5 w-5" />
               Consulta Gratuita
